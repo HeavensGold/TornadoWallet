@@ -31,7 +31,7 @@
                             </small>
                         </div>
                         <br/>
-                        <img src="http://chart.apis.google.com/chart?cht=qr&chs=300x300&chl={{ bismuth['server']['address'] }}&chld=H|0"/><br/>
+                        <div id="qrcode-address" style="text-align: center; margin: 20px 0;"></div>
                         {{ _("This is the QR code for your address only.")}}
                     </div>
                 </div>
@@ -74,7 +74,7 @@
                     {% if bisurl %}
 
                     <br/>
-                    <img src="http://chart.apis.google.com/chart?cht=qr&chs=300x300&chl={{ bisurl }}&chld=H|0"/><br/>
+                    <div id="qrcode-bisurl" style="text-align: center; margin: 20px 0;"></div>
                     {{ _("This is the QR code for your address, data and amount as a BisUrl.")}}<br/>
                     {{ _("You can copy/paste this image to send in a mail or anything")}}
                     <br/>
@@ -83,7 +83,40 @@
                     <button type="button" class="btn btn-success float-right copied" style="display:none">
                                 <i class="material-icons">done_outline</i> {{ _('Copied to Clipboard') }}
                     </button>
-                    {% end %}
+{% end %}
+
+<script src="/common/js/qrcode.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function generateQR(text, elementId) {
+        try {
+            var qr = qrcode(0, 'H');
+            qr.addData(text);
+            qr.make();
+            
+            var qrHTML = qr.createImgTag(4, 8);
+            document.getElementById(elementId).innerHTML = qrHTML;
+        } catch (error) {
+            console.error('QR Code generation failed:', error);
+            document.getElementById(elementId).innerHTML = '<p>QR Code generation failed</p>';
+        }
+    }
+    
+    // Generate QR code for address
+    const address = "{{ address }}";
+    if (address) {
+        generateQR(address, 'qrcode-address');
+    }
+    
+    // Generate QR code for BIS URL if available
+    {% if bisurl %}
+    const bisurl = "{{ bisurl }}";
+    if (bisurl) {
+        generateQR(bisurl, 'qrcode-bisurl');
+    }
+    {% end %}
+});
+</script>
                 </div>
             </div>
         </div>
